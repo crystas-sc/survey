@@ -10,7 +10,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect, useState } from "react";
-
+import { transformSurveyToJsonSchema } from "../utils/transform-util"
 const uiSchema: UiSchema = {
     sections: {
         "ui:accordian": true,
@@ -96,16 +96,8 @@ const schema: RJSFSchema =
                                                     type: "array",
                                                     title: "Enter options",
                                                     items: {
-                                                        type: "object",
-                                                        title: "",
-                                                        properties: {
-                                                            option: {
-                                                                type: "string",
-                                                                title: "",
-                                                            }
-
-                                                        },
-                                                        required: ["option"]
+                                                        type: "string",
+                                                        title: ""
 
                                                     },
                                                     minItems: 2
@@ -134,9 +126,9 @@ const schema: RJSFSchema =
 
 export default function CreateQuestion() {
     const [formData, setFormData] = useState({});
-    useEffect(()=>{
-        setFormData(JSON.parse(window.localStorage.getItem("savedSurvey")||"{}"))
-    },[])
+    useEffect(() => {
+        setFormData(JSON.parse(window.localStorage.getItem("savedSurvey") || "{}"))
+    }, [])
     return <>
         <Form
             formData={formData}
@@ -145,7 +137,11 @@ export default function CreateQuestion() {
             uiSchema={uiSchema}
             widgets={{ rte: RichTextWidget }}
             templates={{ ArrayFieldTemplate }}
-            onSubmit={(form) => { console.log("formData", form.formData) ; window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))}}
+            onSubmit={(form) => { 
+                console.log("formData", form.formData); 
+                window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))
+                console.log("submit", JSON.stringify(transformSurveyToJsonSchema(form.formData)))
+            }}
         >
             <>
                 <Button type="submit" >Save survey</Button>
@@ -190,7 +186,7 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
             console.log("ArrayFieldTemplateProps element", element); return (
                 <>
                     <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                        <Box sx={{ flexGrow: 1,p:0 }}>
+                        <Box sx={{ flexGrow: 1, p: 0 }}>
                             {element.children}
                         </Box>
 

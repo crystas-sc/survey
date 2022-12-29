@@ -7,11 +7,16 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import CreateQuestion from './routes/create-question';
+import SurveyView from "./routes/survey-view"
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <CreateQuestion />,
+  },
+  {
+    path: "/survey/:section/:question",
+    element: <SurveyView />,
   },
 ]);
 
