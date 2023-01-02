@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect, useState } from "react";
 import { transformSurveyToJsonSchema } from "../utils/transform-util"
+import { decryptMessage, encryptMessage } from "../utils/aes-encryption"
+
 const uiSchema: UiSchema = {
     sections: {
         "ui:accordian": true,
@@ -137,10 +139,14 @@ export default function CreateQuestion() {
             uiSchema={uiSchema}
             widgets={{ rte: RichTextWidget }}
             templates={{ ArrayFieldTemplate }}
-            onSubmit={(form) => { 
-                console.log("formData", form.formData); 
+            onSubmit={async (form) => {
+                console.log("formData", form.formData);
                 window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))
                 console.log("submit", JSON.stringify(transformSurveyToJsonSchema(form.formData)))
+                let encryptedMessage = await encryptMessage(form.formData)
+                console.log("encryptedMessage",encryptedMessage)
+                console.log("decryptedMessage",await decryptMessage(encryptedMessage))
+
             }}
         >
             <>
