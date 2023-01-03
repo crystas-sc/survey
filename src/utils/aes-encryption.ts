@@ -18,16 +18,20 @@ export async function getNewKey() {
     );
 }
 
-export async function importKey(jwk: any) {
+export async function importKey(jwk: string) {
     return window.crypto.subtle.importKey(
         "jwk",
-        jwk,
+        JSON.parse(jwk),
         {
             name: "AES-CTR",
         },
         true,
         ["encrypt", "decrypt"]
     );
+}
+
+export async function exportKey(key: CryptoKey){
+    return JSON.stringify(await window.crypto.subtle.exportKey('jwk', key))
 }
 
 export async function getKey(): Promise<CryptoKey> {
@@ -40,13 +44,12 @@ export async function getKey(): Promise<CryptoKey> {
         return aesKey
     } else {
 
-        return await importKey(JSON.parse(window.localStorage.getItem("aesKey") as string))
+        return await importKey(window.localStorage.getItem("aesKey") as string)
 
     }
 }
 
-export async function encryptMessage(jsonData: any) {
-    let key = await getKey()
+export async function encryptMessage(key: CryptoKey, jsonData: any) {
     let encoded = getJSONMessageEncoding(jsonData);
     // The counter block value must never be reused with a given key.
     let ciphertextBuffer = await window.crypto.subtle.encrypt(
@@ -63,8 +66,7 @@ export async function encryptMessage(jsonData: any) {
     return btoa(String.fromCharCode(...new Uint8Array(ciphertextBuffer)))
 }
 
-export async function decryptMessage(base64Str: string) {
-    let key = await getKey()
+export async function decryptMessage(key: CryptoKey, base64Str: string) {
     let decrypted = await window.crypto.subtle.decrypt(
         {
             name: "AES-CTR",

@@ -11,7 +11,15 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect, useState } from "react";
 import { transformSurveyToJsonSchema } from "../utils/transform-util"
-import { decryptMessage, encryptMessage } from "../utils/aes-encryption"
+import {
+    decryptMessage, encryptMessage,
+    exportKey, importKey, getNewKey
+} from "../utils/aes-encryption"
+import {
+    decryptMessage as rsaDecryptMessage, encryptMessage as rsaEncryptMessage,
+    getNewKey as getNewRsaKey,
+    exportPubKey, exportPvtKey, importPubKey, importPvtKey
+} from "../utils/ppk-encryption"
 
 const uiSchema: UiSchema = {
     sections: {
@@ -131,6 +139,49 @@ export default function CreateQuestion() {
     useEffect(() => {
         setFormData(JSON.parse(window.localStorage.getItem("savedSurvey") || "{}"))
     }, [])
+
+    const handleSubmit = async (data: any) => {
+        // TODO document why this async arrow function is empty
+        const aesKeyStr = await exportKey(await getNewKey())
+
+        const ppk = await getNewRsaKey()
+        const pubKeyStr = await exportPubKey(ppk.publicKey)
+        const pvtKeyStr = await exportPvtKey(ppk.privateKey)
+
+
+
+        console.log("pubKeyStr", pubKeyStr)
+        console.log("pvtKeyStr", pvtKeyStr)
+        console.log("aesKeyStr", aesKeyStr)
+
+
+
+        const pubKey = await importPubKey(pubKeyStr)
+        const pvtKey = await importPvtKey(pvtKeyStr)
+        console.log("pubKey", pubKey)
+        console.log("pvtKey", pvtKey)
+
+        const encAesKey = await rsaEncryptMessage(pubKey, aesKeyStr)
+        console.log("encAesKey", encAesKey)
+        const decAesKey = await rsaDecryptMessage(pvtKey, encAesKey)
+        console.log("decAesKey", decAesKey)
+
+
+
+
+        const aesKey = await importKey(decAesKey)
+
+        console.log("aesKey", aesKey)
+        let encData = await encryptMessage(aesKey, JSON.stringify(data))
+        console.log("encData", encData)
+        let decData = await decryptMessage(aesKey, encData)
+        console.log("decData", decData)
+
+
+
+
+    }
+
     return <>
         <Form
             formData={formData}
@@ -141,11 +192,16 @@ export default function CreateQuestion() {
             templates={{ ArrayFieldTemplate }}
             onSubmit={async (form) => {
                 console.log("formData", form.formData);
+
+
                 window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))
+                handleSubmit(form.formData)
                 console.log("submit", JSON.stringify(transformSurveyToJsonSchema(form.formData)))
-                let encryptedMessage = await encryptMessage(form.formData)
-                console.log("encryptedMessage",encryptedMessage)
-                console.log("decryptedMessage",await decryptMessage(encryptedMessage))
+                // let encryptedMessage = await encryptMessage(form.formData)
+                // console.log("encryptedMessage",encryptedMessage)
+                // console.log("decryptedMessage",await decryptMessage(encryptedMessage))
+
+
 
             }}
         >
