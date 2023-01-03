@@ -17,7 +17,11 @@ import { NavLink } from "react-router-dom";
 
 const APP_NAME = "No Login Survey"
 
-const pages = [{ label: 'Create Survey', path: "/" }, { label: 'Take Survey', path: "/survey" }];
+const pages = [
+  { label: 'Create Survey', path: "/" }, 
+  { label: 'Take Survey', path: "/survey" },
+  { label: 'Download Encryption keys', path: "/download-ppk" }
+];
 
 const navStyle = ({ padding: 8, textUnderlineOffset: "0.7em", color: 'inherit', display: 'block' })
 

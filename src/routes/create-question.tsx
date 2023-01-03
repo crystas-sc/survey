@@ -35,6 +35,9 @@ const uiSchema: UiSchema = {
 
             }
         }
+    },
+    pubKey:{
+        "ui:widget": "textarea"
     }
 
 };
@@ -47,6 +50,7 @@ const schema: RJSFSchema =
             type: "string",
             title: "Title"
         },
+        
         sections: {
             title: "Sections",
             type: "array",
@@ -128,9 +132,19 @@ const schema: RJSFSchema =
             },
 
 
-        }
+        },
+        pubKey:{
+            type: "string",
+            title: "JWK Public key"
+        },
+        pvtKeyHint:{
+            type: "string",
+            title: "Hint to remember the entered assoicated Private key"
+        },
 
-    }
+
+    },
+    required: ["title", "pubKey", "pvtKeyHint"]
 }
     ;
 

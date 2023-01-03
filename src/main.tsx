@@ -12,6 +12,7 @@ import {
 import CreateQuestion from './routes/create-question';
 import SurveyView from "./routes/survey-view"
 import ResponsiveAppBar from './components/AppBar';
+import DowloadPPKView from './routes/DownloadPPK';
 
 const router = createBrowserRouter([
   {
@@ -32,8 +33,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <div style={{ display: "flex" }}>
         <div className='content-container-root'>
           <Routes>
-            <Route path="/" element={<CreateQuestion />}>
-            </Route>
+            <Route path="/" element={<CreateQuestion />}></Route>
+            <Route path="/download-ppk" element={<DowloadPPKView />}></Route>
+            
             <Route path="/survey">
               <Route index element={<SurveyView />} />
               <Route path=":section/:question" element={<SurveyView />} />
