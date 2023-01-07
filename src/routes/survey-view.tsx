@@ -7,6 +7,7 @@ import { Box, Button, Divider, Typography } from "@mui/material";
 import HTMLViewerWidget from "../components/HTMLViewerWidget";
 import MultiChoiceWithOtherWidget from "../components/MultiChoiceWithOtherWidget";
 import { useNavigate, useParams } from 'react-router-dom';
+import { db, insertSurvey } from "../utils/indexdb";
 
 
 
@@ -32,7 +33,7 @@ export default function SurveyView() {
             templates={{ ObjectFieldTemplate }}
             onSubmit={(form) => {
                 console.log("formData", form.formData);
-                // window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))
+                insertSurvey(db,{usernameid: `user-${Math.random()}`, ...form.formData})
                 // console.log("submit", JSON.stringify(transformSurveyToJsonSchema(form.formData)))
             }}
         >
@@ -67,7 +68,7 @@ function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
         const questionNo = currentPaths[2].replace("question", "")
         totalQuestionInSection = Object.keys(props.registry.rootSchema.properties["section" + section].properties).length
 
-        console.log("ObjectFieldTemplateProps s q", section, sectionNo, question, questionNo)
+        // console.log("ObjectFieldTemplateProps s q", section, sectionNo, question, questionNo)
         if (sectionNo != section || question != questionNo)
             return null
     }
@@ -100,21 +101,20 @@ function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
             </>}
 
             {props.description}
-            {props.properties.map(element => {
-                console.log("pw-ele",element);
+            {props.properties.map((element,idx) => {
                 if(element.name.startsWith("section")){
                     const schemaSectionNo = element.name.replace("section","")
                     if(schemaSectionNo != section){
-                        return <div style={{display:"none"}}>{element.content}</div>
+                        return <div key={section} style={{display:"none"}}>{element.content}</div>
                     }
                 }
                 if(element.name.startsWith("question")){
                     const schemaQuestionNo = element.name.replace("question","")
                     if(schemaQuestionNo != question){
-                        return <div style={{display:"none"}}>{element.content}</div>
+                        return <div key={question} style={{display:"none"}}>{element.content}</div>
                     }
                 }
-                return <div className="property-wrapper">{element.content}</div>
+                return <div key={element.name} className="property-wrapper">{element.content}</div>
             })
             }
             <Box sx={{ textAlign: "right", pt: 3 }}>

@@ -20,7 +20,8 @@ const APP_NAME = "No Login Survey"
 const pages = [
   { label: 'Create Survey', path: "/" }, 
   { label: 'Take Survey', path: "/survey" },
-  { label: 'Download Encryption keys', path: "/download-ppk" }
+  { label: 'Encryption keys', path: "/download-ppk" },
+  { label: 'Visualization', path: "/viz" }
 ];
 
 const navStyle = ({ padding: 8, textUnderlineOffset: "0.7em", color: 'inherit', display: 'block' })

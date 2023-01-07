@@ -16,8 +16,7 @@ height: 100px;
 `
 
 export default function DowloadPPKView() {
-    const handleClick = async (e) => {
-        console.log(e)
+    const handleClick = async (e: any) => {
         const ppk = await getNewKey();
         const pvtKeyStr = await exportPvtKey(ppk.privateKey)
         const pubKeyStr = await exportPubKey(ppk.publicKey)

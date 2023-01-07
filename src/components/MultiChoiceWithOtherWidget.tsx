@@ -4,7 +4,6 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { Box, IconButton, TextField } from '@mui/material';
-import { prependListener } from 'process';
 
 function getStateBasedOnSelectionAndSuggestion(selectedValues : string[], suggestionList: string[]){
     let intersection = suggestionList.filter(it => selectedValues.includes(it));
@@ -15,7 +14,6 @@ function getStateBasedOnSelectionAndSuggestion(selectedValues : string[], sugges
 }
 
 export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
-    console.log("props.value", props.value)
     const initState = getStateBasedOnSelectionAndSuggestion(props.value || [], props.schema.items?.suggestions || []) //(props.value || []).reduce((a: any, c: string) => ({ ...a, [c]: true }), { others: [] })
     const [state, setState] = React.useState(initState);
     useEffect(()=>{
@@ -56,7 +54,6 @@ export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
     };
     return (
         <FormGroup>
-            {JSON.stringify(state)}
             {props.schema.items.suggestions?.map((it: string) => {
                 return <FormControlLabel control={<Checkbox checked={state.suggestedSelectionSet.has(it)} onChange={handleChange} name={it} />} label={it} />
             })}
@@ -73,7 +70,5 @@ export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
     );
 }
 
-function createMarkup(htmlStr: string) {
-    return { __html: htmlStr };
-}
+
 
