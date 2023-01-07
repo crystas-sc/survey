@@ -9,6 +9,6 @@ A Complete in browser survey tool which also provides a secure way of communicat
 * Browser Cypto API
 
 ## Architecture
-![Architecture Diagram](nsl-arch.png)
+![Architecture Diagram](./nls-arch.svg)
 
 
