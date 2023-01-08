@@ -7,7 +7,6 @@ import { Box, Button, Divider, getSkeletonUtilityClass, Typography } from "@mui/
 import HTMLViewerWidget from "../components/HTMLViewerWidget";
 import MultiChoiceWithOtherWidget from "../components/MultiChoiceWithOtherWidget";
 import { useNavigate, useParams } from 'react-router-dom';
-import { db, insertSurvey } from "../utils/indexdb";
 import { encryptMessage, exportKey, getKey, getNewKey } from "../utils/aes-encryption";
 import {
     decryptMessage as rsaDecryptMessage, encryptMessage as rsaEncryptMessage,
@@ -17,6 +16,7 @@ import {
 const dummyPubKey = {"alg":"RSA-OAEP-256","e":"AQAB","ext":true,"key_ops":["encrypt"],"kty":"RSA","n":"tmotKzDCo0T0Bu3bIuKmkdqTZ5uRwCzOWBYI1M52oB2PVXYXmpI6N3YZzxOcjdxrdqrpVDyk5W1j_qXYbjFSBpkVGH0EAKbefdsbMFNl4ojosQccp-TkdA1vV0HMBbTL1p8nN-nPcEP_AeHgGwg0QcOmSMazNq5xTwN9nHn9hkYPlGhehljx6IX4JpybozMOktWcfeUzHff_HwvXcEzb7rTrz9x6LXSbNSMbkVmF706-YPSymFnPxI2IWH3dGqZKK42ztZgxD0QXAPn29EI-_mAm-wVYSOGX0IN_5S6mhrE3zHEEep0SCCbZOyzS_St0k7LeKKfcIi5MtCgpbtgVMQ"}
 
 export default function SurveyView() {
+    const [formData, setFormData]= useState({})
     const [jsonSchema, setJsonSchema] = useState({ schema: {}, uiSchema: {} })
     useEffect(() => {
         const schemaStr = window.localStorage.getItem("savedSurvey");
@@ -36,6 +36,12 @@ export default function SurveyView() {
 
             widgets={{ "Multi-choice-with-other": MultiChoiceWithOtherWidget }}
             templates={{ ObjectFieldTemplate }}
+            onChange={(form)=>{
+                
+                console.log("onchange", form.formData)
+                setFormData(form.formData)
+            }}
+            formData={formData}
             onSubmit={async (form) => {
                 const aesKey = await getNewKey()
                 const aesKeyStr = await exportKey(aesKey)

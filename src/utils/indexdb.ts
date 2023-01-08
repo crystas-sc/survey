@@ -1,15 +1,12 @@
-export let indexedDBCurrentVersion = parseInt(window.localStorage.getItem("DB_CURRENT_VER") || "1" ) 
+export let indexedDBCurrentVersion = parseInt(window.localStorage.getItem("DB_CURRENT_VER") || "1")
 
-export const request: IDBOpenDBRequest = window.indexedDB.open('SURVEY_DB', indexedDBCurrentVersion);
-export let db: IDBDatabase;
-export let store: IDBObjectStore;
+export let request: IDBOpenDBRequest = window.indexedDB.open('SURVEY_DB', indexedDBCurrentVersion);
 request.onerror = (event: any) => {
     console.error(event!.target!.result)
 }
 request.onsuccess = (event: any) => {
     // add implementation here
     console.log("onsuccess", event)
-    db = event.target.result;
 
     // // create the Contacts object store 
     // // with auto-increment id
@@ -25,11 +22,10 @@ request.onsuccess = (event: any) => {
 
 // create the Contacts object store and indexes
 request.onupgradeneeded = (event: any) => {
-    db = event.target.result;
 
     // create the Contacts object store 
     // with auto-increment id
-    store = db.createObjectStore('SURVEY_STORE', {
+    let store = request.result.createObjectStore('SURVEY_STORE', {
         autoIncrement: true
     });
 
@@ -43,44 +39,51 @@ export function generalNameToStoreName(name: string) {
     return name.replaceAll(/\s/gi, "_").toUpperCase() + "_STORE"
 }
 
-export function createStoreIfNotExists(db: IDBDatabase, name: string, questionnaireSectionData: any) {
-    
+export function createStoreIfNotExists(name: string, questionnaireSectionData: any) {
+    let db = request.result
     if (!db.objectStoreNames.contains(generalNameToStoreName(name))) {
         db.close();
-        const request: IDBOpenDBRequest = window.indexedDB.open('SURVEY_DB', indexedDBCurrentVersion+1)
-        request.onsuccess = (event: any) => { 
-            db = event.target.result;
-            window.localStorage.setItem("DB_CURRENT_VER",indexedDBCurrentVersion+1+"")
-            db.onerror = (event: any) =>{
+        request = window.indexedDB.open('SURVEY_DB', indexedDBCurrentVersion + 1)
+        request.onsuccess = (event: any) => {
+            window.localStorage.setItem("DB_CURRENT_VER", indexedDBCurrentVersion + 1 + "")
+            db.onerror = (event: any) => {
                 console.log("db error", event)
             }
         };
         request.onupgradeneeded = (event: any) => {
-            db = event.target.result;
-            window.localStorage.setItem("DB_CURRENT_VER",indexedDBCurrentVersion+1+"")
-            store = db.createObjectStore(generalNameToStoreName(name), {
-                autoIncrement: true
+            db = request.result;
+            window.localStorage.setItem("DB_CURRENT_VER", indexedDBCurrentVersion + 1 + "")
+            let store = db.createObjectStore(generalNameToStoreName(name), {
+                autoIncrement: true,
+                keyPath: "usernameid"
             });
-    
+
+
             questionnaireSectionData.forEach((section: any, sectionIdx: number) => {
                 section.questions.forEach((question: any, qNo: number) => {
                     let key = `section${sectionIdx}.question${qNo}.a`
                     store.createIndex(key, key, { unique: false, multiEntry: false });
                 })
             })
+
+
         }
         request.onerror = (event: any) => {
             console.error(event!.target!.result)
         }
-        
+
+        request.onblocked = (event: any) => {
+            console.error("onblocked", event)
+        }
+
 
 
     }
 }
 
-export function insertSurvey(db: IDBDatabase, survey: any, storeName: string) {
+export function insertSurvey( survey: any, storeName: string) {
     // create a new transaction
-    const txn = db.transaction(storeName, 'readwrite');
+    const txn = request.result.transaction(storeName, 'readwrite');
 
     // get the Contacts object store
     const store = txn.objectStore(storeName);
@@ -104,10 +107,10 @@ export function insertSurvey(db: IDBDatabase, survey: any, storeName: string) {
     };
 }
 
-export async function getAllIndexedAnswers(db: IDBDatabase, storeName: string, indexName: string) {
+export async function getAllIndexedAnswers(storeName: string, indexName: string) {
 
     return new Promise((resolve, reject) => {
-        const txn = db.transaction(storeName, "readonly");
+        const txn = request.result.transaction(storeName, "readonly");
         const objectStore = txn.objectStore(storeName);
         let result: any[] = [];
 
