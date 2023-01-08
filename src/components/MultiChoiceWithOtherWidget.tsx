@@ -26,7 +26,7 @@ export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
             // state.otherSelections.push(event.target.value)
             if (event.target.value.trim())
                 state.otherSelections[event.target.name.split("-")[1] as unknown as number] = event.target.value
-            else 
+            else
                 delete state.otherSelections[event.target.name.split("-")[1] as unknown as number]
         } else if (event.target.checked) {
             state.suggestedSelectionSet.add(event.target.name)
@@ -63,7 +63,7 @@ export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
                 state.otherSelections.concat([""]).map((it: string, idx: number) =>
                     <Box sx={{ display: "flex", mb: 1 }} key={`othersBox-${idx}`}>
                         <TextField sx={{ flexGrow: 1 }} key={`others-${idx}`} placeholder='Others' name={`others-${idx}`} onChange={handleChange} value={it} ></TextField>
-                        <IconButton onClick={handleOthersRemove(idx)}>X</IconButton>
+                        {it && <IconButton onClick={handleOthersRemove(idx)}>X</IconButton>}
                     </Box>
                 )
             }
