@@ -20,6 +20,7 @@ import {
     getNewKey as getNewRsaKey,
     exportPubKey, exportPvtKey, importPubKey, importPvtKey
 } from "../utils/ppk-encryption"
+import { downloadFile } from "../utils/general";
 
 const uiSchema: UiSchema = {
     sections: {
@@ -36,7 +37,7 @@ const uiSchema: UiSchema = {
             }
         }
     },
-    pubKey:{
+    pubKey: {
         "ui:widget": "textarea"
     }
 
@@ -50,7 +51,7 @@ const schema: RJSFSchema =
             type: "string",
             title: "Title"
         },
-        
+
         sections: {
             title: "Sections",
             type: "array",
@@ -133,11 +134,11 @@ const schema: RJSFSchema =
 
 
         },
-        pubKey:{
+        pubKey: {
             type: "string",
             title: "JWK Public key"
         },
-        pvtKeyHint:{
+        pvtKeyHint: {
             type: "string",
             title: "Hint to remember the entered assoicated Private key"
         },
@@ -211,6 +212,10 @@ export default function CreateQuestion() {
                 window.localStorage.setItem("savedSurvey", JSON.stringify(form.formData))
                 handleSubmit(form.formData)
                 console.log("submit", JSON.stringify(transformSurveyToJsonSchema(form.formData)))
+                const res: any = transformSurveyToJsonSchema(form.formData);
+                res["pubKey"] = form.formData.pubKey
+                res["pvtKeyHint"] = form.formData.pvtKeyHint
+                downloadFile(form.formData.title + ".json", JSON.stringify(res))
                 // let encryptedMessage = await encryptMessage(form.formData)
                 // console.log("encryptedMessage",encryptedMessage)
                 // console.log("decryptedMessage",await decryptMessage(encryptedMessage))

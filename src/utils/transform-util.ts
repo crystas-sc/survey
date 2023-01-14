@@ -1,3 +1,4 @@
+import { RJSFSchema } from "@rjsf/utils"
 
 export function transformSurveyToJsonSchema(surveyJSON: any) {
     const schemaJson = {
@@ -24,7 +25,7 @@ export function transformSurveyToJsonSchema(surveyJSON: any) {
                         },
                         "a": getJsonSchemaFromComponentType(question)
                     },
-                    
+
 
 
 
@@ -48,8 +49,8 @@ export function transformSurveyToJsonSchema(surveyJSON: any) {
 export function getJsonSchemaFromComponentType(question: any) {
     switch (question.component) {
         case "Multi-choice-with-other":
-            
-            return { type: "array", title:"", uiWidget: question.component, minItems:1, items: { type: question.type || "string", suggestions: question.options } }
+
+            return { type: "array", title: "", uiWidget: question.component, minItems: 1, items: { type: question.type || "string", suggestions: question.options } }
 
         default:
             return {
@@ -64,16 +65,16 @@ export function getJSchemaDependenciesFromComponentType(question: any) {
     switch (question.component) {
         case "Multi-choice-with-other":
             return {
-                a:{
-                    "anyOf":[{
-                        properties:{
-                            a:{
-                                type:"array",
-                                items:{type:"string"}
+                a: {
+                    "anyOf": [{
+                        properties: {
+                            a: {
+                                type: "array",
+                                items: { type: "string" }
                             }
                         }
                     }
-                       
+
                     ]
                 }
             }
@@ -103,14 +104,62 @@ export function getUISchemaFromCustomJSONSchema(schemaJson: any) {
         }
     }
     if (schemaJson.items && schemaJson.items.properties) {
-        
+
         for (let k in schemaJson.items.properties) {
             uiSchema["items"][k] = getUISchemaFromCustomJSONSchema(schemaJson.items.properties[k])
-            
+
         }
     }
 
     return uiSchema
 }
 
+export type TreeViewType = {
+    label?: string,
+    depth: number,
+    children?: TreeViewType[]
+}
+export function schemaToTreeView(schemaJson: RJSFSchema, depth = 0) {
+    let res: TreeViewType = { depth }
+    if (schemaJson.type == "object") {
+        res.label = schemaJson.title
+        res.children = []
+        let i = 0;
+        for (let prop in schemaJson.properties) {
 
+            i++;
+            if (prop.startsWith("question")) {
+                let resQ: TreeViewType = { depth: depth + 1, label: "Question " + i }
+                res.children.push(resQ)
+                continue
+
+            }
+            res.children.push(schemaToTreeView(schemaJson.properties[prop], depth + 1))
+        }
+    }
+    return res;
+}
+
+export function getSchemaValuesFromSchema(schemaJson: RJSFSchema) {
+    const res: any = { sections: [] }
+    for (let prop in schemaJson.properties) {
+
+        let section: any = {
+            name: schemaJson.properties[prop].title,
+            questions: []
+        }
+
+        res.sections.push(section)
+        let sectionProperties = schemaJson.properties[prop].properties
+        for (let sProp in sectionProperties) {
+            let question: any = {
+                question: sectionProperties[sProp].properties.q.title,
+                options: sectionProperties[sProp].properties.a.items.suggestions
+            }
+            section.questions.push(question)
+        }
+
+
+    }
+    return res;
+}

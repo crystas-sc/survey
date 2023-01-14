@@ -15,6 +15,7 @@ import {
     getNewKey as getNewRsaKey,
     exportPubKey, exportPvtKey, importPubKey, importPvtKey
 } from "../utils/ppk-encryption"
+import { getSchemaValuesFromSchema } from "../utils/transform-util";
 
 type AddQuestionnaireProps = {
     name: string,
@@ -46,6 +47,8 @@ export default function AnsVizContainer() {
             return
         }
         try {
+            
+            data.questionnaireData = getSchemaValuesFromSchema(data.questionnaireData)
             console.log("data", data)
             setOpenQDialog(!openQDialog)
             window.localStorage.setItem("questionData", JSON.stringify(data))
@@ -72,6 +75,7 @@ export default function AnsVizContainer() {
             let decData = await decryptMessage(aesKey, encFormData)
             console.log("decData", decData, name)
             insertSurvey( { usernameid: name, ...decData }, generalNameToStoreName(questionData.name))
+            setOpenResultDialog(false)
         } catch (err) {
             console.error(err)
         }

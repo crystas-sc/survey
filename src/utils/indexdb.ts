@@ -25,14 +25,14 @@ request.onupgradeneeded = (event: any) => {
 
     // create the Contacts object store 
     // with auto-increment id
-    let store = request.result.createObjectStore('SURVEY_STORE', {
-        autoIncrement: true
-    });
+    // let store = request.result.createObjectStore('SURVEY_STORE', {
+    //     autoIncrement: true
+    // });
 
-    // create an index on the email property
-    let index = store.createIndex('name', 'name', {
-        unique: true
-    });
+    // // create an index on the email property
+    // let index = store.createIndex('name', 'name', {
+    //     unique: true
+    // });
 };
 
 export function generalNameToStoreName(name: string) {
