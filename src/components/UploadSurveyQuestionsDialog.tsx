@@ -40,7 +40,7 @@ export default function UploadSurveyQuestionsDialog({ open, handleClose }: AddSu
 
             reader.onload = function () {
                 console.log(reader.result);
-                handleData(reader.result);
+                handleData(reader.result as string);
             };
 
             reader.onerror = function () {
