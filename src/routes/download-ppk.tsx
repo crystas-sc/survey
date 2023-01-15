@@ -18,6 +18,8 @@ height: 100px;
 
 export default function DowloadPPKView() {
     const handleClick = async (e: any) => {
+        e.stopPropagation()
+        e.preventDefault()
         const ppk = await getNewKey();
         const pvtKeyStr = await exportPvtKey(ppk.privateKey)
         const pubKeyStr = await exportPubKey(ppk.publicKey)
@@ -30,6 +32,7 @@ Below line is the private jwk key:
 ${pvtKeyStr}
         `
         downloadFile(`keys-${e.target.filename.value}.txt`, text)
+        return false;
     }
     
     return <Container >

@@ -4,6 +4,8 @@ export function createMarkup(htmlStr: string) {
 
 export function downloadFile(filename: string, text: string) {
     var element = document.createElement('a');
+    element.setAttribute('target', "_blank");
+
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
 
