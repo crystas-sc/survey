@@ -83,7 +83,7 @@ const schema: RJSFSchema =
                                 },
                                 component: {
                                     type: "string", title: "Select the Answer component", default: "Text",
-                                    enum: ["Text", "Single-choice", "Multi-choice", "Multi-choice-with-other"]
+                                    enum: ["Text", "Single-choice", "Single-choice-with-other", "Multi-choice", "Multi-choice-with-other"]
                                 },
 
 
@@ -104,7 +104,7 @@ const schema: RJSFSchema =
                                             properties: {
                                                 component: {
                                                     enum: [
-                                                        "Single-choice", "Multi-choice", "Multi-choice-with-other"
+                                                        "Single-choice", "Single-choice-with-other", "Multi-choice", "Multi-choice-with-other"
                                                     ]
                                                 },
                                                 options: {

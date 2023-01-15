@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --base=/survey",
     "preview": "vite preview",
     "postinstall": "node ./postinstall.cjs",
     "predeploy": "npm run build",

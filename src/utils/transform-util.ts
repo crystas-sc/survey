@@ -51,6 +51,9 @@ export function getJsonSchemaFromComponentType(question: any) {
         case "Multi-choice-with-other":
 
             return { type: "array", title: "", uiWidget: question.component, minItems: 1, items: { type: question.type || "string", suggestions: question.options } }
+        case "Single-choice-with-other":
+
+            return { type: "string", title: "", uiWidget: question.component, items: { type: question.type || "string", suggestions: question.options } }
 
         default:
             return {

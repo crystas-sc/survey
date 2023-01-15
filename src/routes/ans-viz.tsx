@@ -4,7 +4,7 @@ import { deepPurple } from '@mui/material/colors';
 import AddQuestionnaireDialog from "../components/AddQuestionnaireDialog";
 import { useEffect, useState } from "react";
 import { Widgets } from "@rjsf/mui";
-import { createStoreIfNotExists,  generalNameToStoreName, getAllIndexedAnswers, insertSurvey } from "../utils/indexdb";
+import { createStoreIfNotExists, generalNameToStoreName, getAllIndexedAnswers, insertSurvey } from "../utils/indexdb";
 import AddSurveyResultDialog from "../components/AddSurveyResultDialog";
 import {
     decryptMessage, encryptMessage,
@@ -47,13 +47,13 @@ export default function AnsVizContainer() {
             return
         }
         try {
-            
+
             data.questionnaireData = getSchemaValuesFromSchema(data.questionnaireData)
             console.log("data", data)
             setOpenQDialog(!openQDialog)
             window.localStorage.setItem("questionData", JSON.stringify(data))
             setQuestionData(data)
-            createStoreIfNotExists( data.name, data.questionnaireData.sections)
+            createStoreIfNotExists(data.name, data.questionnaireData.sections)
         } catch (err) {
             console.error(err)
         }
@@ -74,7 +74,7 @@ export default function AnsVizContainer() {
             const aesKey = await importKey(decAesKey)
             let decData = await decryptMessage(aesKey, encFormData)
             console.log("decData", decData, name)
-            insertSurvey( { usernameid: name, ...decData }, generalNameToStoreName(questionData.name))
+            insertSurvey({ usernameid: name, ...decData }, generalNameToStoreName(questionData.name))
             setOpenResultDialog(false)
         } catch (err) {
             console.error(err)
@@ -105,25 +105,35 @@ export default function AnsVizContainer() {
                     let prevOptions = data.answers.map(ans => ans.answer)
                     options.forEach((opt: string) => {
                         if (!prevOptions.includes(opt)) {
-                            data.answers.push({ answer: opt, count: 0 , users:[]})
+                            data.answers.push({ answer: opt, count: 0, users: [] })
                         }
                     })
                 }
                 let indexName = `section${selectedSection}.question${selectedQno}.a`
-                let result: any[] = await getAllIndexedAnswers( generalNameToStoreName(questionData.name), indexName) as any[]
+                let result: any[] = await getAllIndexedAnswers(generalNameToStoreName(questionData.name), indexName) as any[]
                 console.log("indexedResult", result)
                 result.forEach(res => {
                     let answers = res["section" + selectedSection]["question" + selectedQno].a
-                    answers.forEach((ans: string) => {
-                        let found = data.answers.find(d => d.answer == ans)
+                    if (Array.isArray(answers)) {
+                        answers.forEach((ans: string) => {
+                            let found = data.answers.find(d => d.answer == ans)
+                            if (found) {
+                                found.count += 1
+                                found.users.push(res.usernameid)
+                            } else {
+                                data.answers.push({ answer: ans, count: 1, users: [res.usernameid] })
+                            }
+
+                        })
+                    } else {
+                        let found = data.answers.find(d => d.answer == answers)
                         if (found) {
                             found.count += 1
                             found.users.push(res.usernameid)
                         } else {
-                            data.answers.push({ answer: ans, count: 1, users:[res.usernameid] })
+                            data.answers.push({ answer: answers, count: 1, users: [res.usernameid] })
                         }
-
-                    })
+                    }
                 })
                 setData(data)
             }
@@ -171,7 +181,7 @@ export type SurveyResultData = {
 export type SurveyAnswerCount = {
     answer: string,
     count: number,
-    users: string[] 
+    users: string[]
 }
 
 export function AnsViz({ data }: { data: SurveyResultData }) {
@@ -195,7 +205,7 @@ export function AnsViz({ data }: { data: SurveyResultData }) {
                     justifyContent: "right"
                 }}>
                     <Typography  >{row.answer}</Typography></Box>
-                <Box sx={{ p: 1 }} title={ row.users.join(", ")}>
+                <Box sx={{ p: 1 }} title={row.users.join(", ")}>
                     <Box sx={{
                         //@ts-ignore
                         backgroundColor: deepPurple[(Math.abs((idx % 4) + 4) * 100)],

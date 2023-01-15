@@ -6,6 +6,7 @@ import { ArrayFieldTemplateProps, ErrorListProps, ObjectFieldTemplateProps, RJSF
 import { Alert, AlertTitle, Box, Button, Divider, getSkeletonUtilityClass, Typography } from "@mui/material";
 import HTMLViewerWidget from "../components/HTMLViewerWidget";
 import MultiChoiceWithOtherWidget from "../components/MultiChoiceWithOtherWidget";
+import RadioChoiceWithOtherWidget from "../components/RadioChoiceWithOtherWidget";
 import { useNavigate, useParams } from 'react-router-dom';
 import { encryptMessage, exportKey, getKey, getNewKey } from "../utils/aes-encryption";
 import {
@@ -68,7 +69,11 @@ export default function SurveyView() {
                     fields={{ NullField: HTMLViewerWidget }}
                     uiSchema={jsonSchema.uiSchema}
 
-                    widgets={{ "Multi-choice-with-other": MultiChoiceWithOtherWidget }}
+                    widgets={{ 
+                        "Multi-choice-with-other": MultiChoiceWithOtherWidget,
+                        "Single-choice-with-other": RadioChoiceWithOtherWidget,
+                    
+                    }}
                     templates={{ ObjectFieldTemplate, ErrorListTemplate }}
                     onChange={(form) => {
 
@@ -100,7 +105,7 @@ export default function SurveyView() {
                     showErrorList="bottom"
                 >
                     <>
-                        {Object.keys(jsonSchema.schema.properties).length > 0 && <Button type="submit" >Send survey</Button>}
+                        {Object.keys(jsonSchema.schema.properties).length > 0 && <Button type="submit" >Copy survey result</Button>}
                     </>
                 </Form>
             </Box>
