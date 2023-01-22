@@ -54,13 +54,15 @@ export default function MultiChoiceWithOtherWidget(props: WidgetProps) {
         }
 
     };
+    const isWithOther = props.uiSchema && props.uiSchema['ui:widget'] === 'Multi-choice-with-other'
+
     return (
         <FormGroup>
             {props.schema.items.suggestions?.map((it: string) => {
                 return <FormControlLabel control={<Checkbox checked={state.suggestedSelectionSet.has(it)} onChange={handleChange} name={it} />} label={it} />
             })}
             {
-                state.otherSelections.concat([""]).map((it: string, idx: number) =>
+                isWithOther && state.otherSelections.concat([""]).map((it: string, idx: number) =>
                     <Box sx={{ display: "flex", mb: 1 }} key={`othersBox-${idx}`}>
                         <TextField sx={{ flexGrow: 1 }} key={`others-${idx}`} placeholder='Others' name={`others-${idx}`} onChange={handleChange} value={it} ></TextField>
                         {it && <IconButton onClick={handleOthersRemove(idx)}>X</IconButton>}

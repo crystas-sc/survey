@@ -1,5 +1,5 @@
 # No Login Survey
-A Complete in browser survey tool which also provides a secure way of communication.
+A fully in-browser survey app, which provides survey creation and participation with secure communication and visualization without any backend service.
 
 ## Technology Stack
 * ReactJS
@@ -7,6 +7,7 @@ A Complete in browser survey tool which also provides a secure way of communicat
 * Material UI
 * IndexedDB
 * Browser Cypto API
+* TinyMCE WYSIWYG HTML editor 
 
 ## Architecture
 ![Architecture Diagram](./nls-arch.svg)

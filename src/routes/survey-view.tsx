@@ -7,7 +7,7 @@ import { Alert, AlertTitle, Box, Button, Divider, getSkeletonUtilityClass, Typog
 import HTMLViewerWidget from "../components/HTMLViewerWidget";
 import MultiChoiceWithOtherWidget from "../components/MultiChoiceWithOtherWidget";
 import RadioChoiceWithOtherWidget from "../components/RadioChoiceWithOtherWidget";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { encryptMessage, exportKey, getKey, getNewKey } from "../utils/aes-encryption";
 import {
     decryptMessage as rsaDecryptMessage, encryptMessage as rsaEncryptMessage,
@@ -27,23 +27,37 @@ type QuestionSchema = {
 export default function SurveyView() {
     const [openDialog, setOpenDialog] = useState(false)
     const [formData, setFormData] = useState({})
+    const [renderedQuestion, setRenderedQuestion] = useState({ selSec: 0, selQ: 0 })
     const [jsonSchema, setJsonSchema] = useState<{ schema: QuestionSchema, uiSchema: any }>(
         { schema: { title: "Please upload JSON", type: "object", properties: {} }, uiSchema: {} })
 
     const params = useParams();
     const navigate = useNavigate();
-    const selSec = typeof params.section == "undefined" ? 0 : parseInt(params.section)
-    const selQ = typeof params.question == "undefined" ? 0 : parseInt(params.question)
+
+
+    const treeViewSchema = schemaToTreeView(jsonSchema.schema)
 
     useEffect(() => {
-        // const schemaStr = window.localStorage.getItem("savedSurvey");
-        // const schema = transformSurveyToJsonSchema(JSON.parse(schemaStr || "{}"))
-        // console.log("schema", schema)
-        // const uiSchema = getUISchemaFromCustomJSONSchema(schema)
-        // console.log("schema-ui", uiSchema)
+        let selSec = typeof params.section == "undefined" ? 0 : parseInt(params.section)
+        let selQ = typeof params.question == "undefined" ? 0 : parseInt(params.question)
+        if(treeViewSchema.children && (treeViewSchema.children?.length< selSec)){
+            selSec=0;
+            selQ=0;
+        }
+        setRenderedQuestion({ selSec, selQ })
+    }, [params.section,params.question,JSON.stringify(treeViewSchema)])
 
-        // setJsonSchema({ schema, uiSchema })
-    }, [])
+    const { selSec, selQ } = renderedQuestion
+
+    // useEffect(() => {
+    //     const schemaStr = window.localStorage.getItem("savedSurvey");
+    //     const schema = transformSurveyToJsonSchema(JSON.parse(schemaStr || "{}"))
+    //     console.log("schema", schema)
+    //     const uiSchema = getUISchemaFromCustomJSONSchema(schema)
+    //     console.log("schema-ui", uiSchema)
+
+    //     setJsonSchema({ schema, uiSchema })
+    // }, [])
 
     const handleDialogClose = (e: React.MouseEvent, json: RJSFSchema) => {
         setOpenDialog(!openDialog)
@@ -61,7 +75,7 @@ export default function SurveyView() {
                 selQ={selQ}
                 handleClick={(section: number, question: number) => { navigate(`/survey/${section}/${question}`); }}
             />
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexGrow: 1, flexBasis: "500px" }}>
                 <Form
 
                     schema={jsonSchema.schema}
@@ -69,10 +83,12 @@ export default function SurveyView() {
                     fields={{ NullField: HTMLViewerWidget }}
                     uiSchema={jsonSchema.uiSchema}
 
-                    widgets={{ 
+                    widgets={{
                         "Multi-choice-with-other": MultiChoiceWithOtherWidget,
+                        "Multi-choice": MultiChoiceWithOtherWidget,
                         "Single-choice-with-other": RadioChoiceWithOtherWidget,
-                    
+                        "Single-choice": RadioChoiceWithOtherWidget,
+
                     }}
                     templates={{ ObjectFieldTemplate, ErrorListTemplate }}
                     onChange={(form) => {
@@ -116,12 +132,12 @@ export default function SurveyView() {
 function ErrorListTemplate(props: ErrorListProps) {
     console.log("ErrorListProps", props)
     const { errors, schema } = props;
-    const getErrorPathMessage= (property: string)=>{
+    const getErrorPathMessage = (property: string) => {
         const pathArr = property?.substring(1)?.split(".")
-        if(pathArr && pathArr.length){
-            const qNo = parseInt(pathArr[1].replace("question",""))
+        if (pathArr && pathArr.length) {
+            const qNo = parseInt(pathArr[1].replace("question", ""))
             const sectionTitle = schema.properties[pathArr[0]].title
-            const questionTitle = `Question ${qNo+1}:`
+            const questionTitle = `Question ${qNo + 1}:`
             return `${sectionTitle} / ${questionTitle} `
         }
         return ""
@@ -133,7 +149,7 @@ function ErrorListTemplate(props: ErrorListProps) {
                 <ul>
                     {errors.map(error => (
                         <li key={error.stack}>
-                          {getErrorPathMessage(error.property as string)}  {error.message}
+                            {getErrorPathMessage(error.property as string)}  {error.message}
                         </li>
                     ))}
                 </ul>
@@ -194,7 +210,7 @@ function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
     const totalSections = Object.keys(props.registry.rootSchema.properties).length
 
     return (
-        <div>
+        <div >
             {props.title && <>
                 <Typography sx={{ fontSize: `${2 / currentPaths.length}rem` }}>{props.title}</Typography>
                 <Divider />

@@ -49,9 +49,11 @@ export function transformSurveyToJsonSchema(surveyJSON: any) {
 export function getJsonSchemaFromComponentType(question: any) {
     switch (question.component) {
         case "Multi-choice-with-other":
+        case "Multi-choice":
 
             return { type: "array", title: "", uiWidget: question.component, minItems: 1, items: { type: question.type || "string", suggestions: question.options } }
         case "Single-choice-with-other":
+        case "Single-choice":
 
             return { type: "string", title: "", uiWidget: question.component, items: { type: question.type || "string", suggestions: question.options } }
 

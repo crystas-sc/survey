@@ -6,14 +6,13 @@ import React from 'react';
 
 
 export default function RadioChoiceWithOtherWidget(props: WidgetProps) {
-
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         props.onChange(event.target.value)
 
     };
     let otherValue = props.schema.items?.suggestions.includes(props.value) ? "" : props.value
-    
+    const isWithOther = props.uiSchema && props.uiSchema['ui:widget'] === 'Single-choice-with-other'
     return (
         <FormGroup>
             <RadioGroup
@@ -25,9 +24,9 @@ export default function RadioChoiceWithOtherWidget(props: WidgetProps) {
                 {props.schema.items.suggestions?.map((it: string) => {
                     return <FormControlLabel key={it} value={it} control={<Radio checked={props.value == it} />} label={it} />
                 })}
-                <Box sx={{ display: "flex", mb: 1 }} key={`othersBox`}>
+                {isWithOther && <Box sx={{ display: "flex", mb: 1 }} key={`othersBox`}>
                     <TextField sx={{ flexGrow: 1 }} key={`others`} placeholder='Others' name={`others`} onChange={handleChange} value={otherValue} ></TextField>
-                </Box>
+                </Box>}
 
             </RadioGroup>
             {/* <Box sx={{ display: "flex" }} key={`othersBox-${state.otherSelections.length}`}>

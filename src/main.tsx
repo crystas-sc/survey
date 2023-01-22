@@ -5,6 +5,8 @@ import './index.css'
 import {
   BrowserRouter,
   createBrowserRouter,
+  createHashRouter,
+  HashRouter,
   Route,
   RouterProvider,
   Routes,
@@ -15,21 +17,12 @@ import ResponsiveAppBar from './components/AppBar';
 import DowloadPPKView from './routes/download-ppk';
 import AnsVizContainer from './routes/ans-viz';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <CreateQuestion />,
-  },
-  {
-    path: "/survey/:section/:question",
-    element: <SurveyView />,
-  },
-]);
+
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
 
-    <BrowserRouter>
+    <HashRouter>
       <ResponsiveAppBar />
       <div style={{ display: "flex" }}>
         <div className='content-container-root'>
@@ -46,6 +39,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           </Routes>
         </div>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
 )

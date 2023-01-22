@@ -202,7 +202,9 @@ export function AnsViz({ data }: { data: SurveyResultData }) {
                     pr: 1, borderRight: "1px solid black",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "right"
+                    justifyContent: "right",
+                    pb: 2,
+                    pt:1
                 }}>
                     <Typography  >{row.answer}</Typography></Box>
                 <Box sx={{ p: 1 }} title={row.users.join(", ")}>
